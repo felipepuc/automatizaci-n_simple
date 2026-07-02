@@ -1,7 +1,7 @@
 # Módulo encargado de la integración con servicios meteorológicos externos
 import requests
 
-def obtener_clima(driver, user_input):
+def obtener_clima(user_input)::
     """
     Obtiene la temperatura actual de una ciudad utilizando el servicio wttr.in.
     
