@@ -18,7 +18,7 @@ COMPANY_TICKERS = {
 
 }
 
-def obtener_precio_accion(driver, user_input):
+def obtener_precio_accion(user_input)::
     """
     Busca y retorna el precio actual de una acción utilizando la librería yfinance.
     
