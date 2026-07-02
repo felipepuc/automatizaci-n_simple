@@ -1,5 +1,5 @@
 from main import procesar_input
-from utilidades.sanitizar import sanitizar
+from utils.sanitizar import sanitizar
 
 
 def test_sanitizar():
