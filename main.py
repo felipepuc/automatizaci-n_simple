@@ -1,6 +1,6 @@
 from funciones_agente.obtener_clima import obtener_clima
 from funciones_agente.obtener_precio_accion import obtener_precio_accion
-from utilidades.sanitizar import sanitizar
+from utils.sanitizar import sanitizar
 
 
 def procesar_input(texto):
