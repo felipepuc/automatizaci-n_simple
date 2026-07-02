@@ -1,17 +1,22 @@
-from funciones_agente.obtener_precio_accion import obtener_precio_accion
-from funciones_agente.obtener_clima import obtener_clima
+from main import procesar_input
+from utilidades.sanitizar import sanitizar
 
-def test_chatbot():
-    """
-    Script de prueba para verificar que las funciones del agente 
-    sigan funcionando correctamente después del refactor.
-    """
-    print("--- Iniciando Pruebas de Funciones ---")
-    
-    print("\n[Prueba] Precio de acción para Microsoft...")
-    msft_price = obtener_precio_accion(None, "Microsoft")
-    print(f"Resultado Microsoft: {msft_price}")
+
+def test_sanitizar():
+    assert sanitizar("Oaxaca de Juárez") == "oaxaca de juarez"
+    assert sanitizar("precio de la acción Microsoft") == "precio de la accion microsoft"
+    assert sanitizar("¿Cuál es la temperatura en Ciudad de México?") == "cual es la temperatura en ciudad de mexico"
+
+
+def test_procesar_input():
+    assert procesar_input(sanitizar("clima en Oaxaca")) == "clima"
+    assert procesar_input(sanitizar("temperatura en Guadalajara")) == "clima"
+    assert procesar_input(sanitizar("precio de la acción Microsoft")) == "precio"
+    assert procesar_input(sanitizar("accion apple")) == "precio"
+    assert procesar_input(sanitizar("hola")) is None
 
 
 if __name__ == "__main__":
-    test_chatbot()
+    test_sanitizar()
+    test_procesar_input()
+    print("Todas las pruebas pasaron correctamente.")
