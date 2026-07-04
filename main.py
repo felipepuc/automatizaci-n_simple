@@ -1,48 +1,50 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+
 from funciones_agente.obtener_clima import obtener_clima
 from funciones_agente.obtener_precio_accion import obtener_precio_accion
 from utils.sanitizar import sanitizar
 
 
-def procesar_input(texto):
-    palabras_clima = ["clima", "temperatura", "tiempo"]
-    palabras_precio = ["precio", "accion", "acciones", "stock", "cotizacion", "valor"]
+# Configuración de Google Chrome para Codespaces
+options = Options()
+options.binary_location = "/usr/bin/google-chrome"
 
-    if any(palabra in texto for palabra in palabras_clima):
-        return "clima"
+options.add_argument("--headless=new")
+options.add_argument("--disable-gpu")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--disable-blink-features=AutomationControlled")
 
-    if any(palabra in texto for palabra in palabras_precio):
-        return "precio"
+# Crear navegador automático
+driver = webdriver.Chrome(options=options)
 
+
+def procesar_input(user_input):
+    if "clima" in user_input or "temperatura" in user_input:
+        return obtener_clima
+    elif "precio" in user_input or "accion" in user_input or "valor" in user_input:
+        return obtener_precio_accion
     return None
 
 
-def chatbot():
-    print("*** Chatbot v1.0.0***")
-    print("Hola, soy el Chatbot v1.0.0. Puedo ayudarte a obtener precios de acciones")
-    print("o indicarte la temperatura actual en cualquier ciudad del mundo.")
-    print("Puedes escribir ejemplos como:")
-    print("precio de la acción de Microsoft")
-    print("clima en Oaxaca")
-    print("Escribe salir para terminar.\n")
+print("Hola, soy tu asistente virtual. ¿En qué puedo ayudarte hoy?")
 
+try:
     while True:
-        user_input = sanitizar(input("--> "))
+        user_input = sanitizar(input("---> "))
 
-        if user_input in ["salir", "exit", "quit", "adios"]:
-            print(">>> Gracias por usar el chatbot. Hasta luego.")
+        if user_input == "salir":
+            print("Hasta luego.")
             break
 
-        intencion = procesar_input(user_input)
+        funcion_agente = procesar_input(user_input)
 
-        if intencion == "clima":
-            print(">>> " + obtener_clima(user_input))
-
-        elif intencion == "precio":
-            print(">>> " + obtener_precio_accion(user_input))
-
+        if funcion_agente is None:
+            print("No entendí tu solicitud. Intenta nuevamente.")
         else:
-            print(">>> No entendí tu solicitud. Pregúntame por el clima o por el precio de una acción.")
+            respuesta = funcion_agente(driver, user_input)
+            print(f">>> {respuesta}")
 
-
-if __name__ == "__main__":
-    chatbot()
+finally:
+    driver.quit()

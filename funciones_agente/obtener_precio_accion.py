@@ -1,44 +1,50 @@
 import yfinance as yf
-
+from utils.sanitizar import sanitizar
 
 EMPRESAS = {
     "microsoft": "MSFT",
     "apple": "AAPL",
-    "tesla": "TSLA",
     "google": "GOOGL",
+    "alphabet": "GOOGL",
     "amazon": "AMZN",
+    "tesla": "TSLA",
     "meta": "META",
+    "facebook": "META",
     "netflix": "NFLX",
     "nvidia": "NVDA"
 }
 
+def obtener_precio_accion(driver, consulta):
+    consulta = sanitizar(consulta)
 
-def obtener_precio_accion(user_input):
-    empresa = user_input
-    empresa = empresa.replace("precio", "")
-    empresa = empresa.replace("accion", "")
-    empresa = empresa.replace("acciones", "")
-    empresa = empresa.replace("stock", "")
-    empresa = empresa.replace("cotizacion", "")
-    empresa = empresa.replace("valor", "")
-    empresa = empresa.replace("de", "")
-    empresa = empresa.replace("la", "")
-    empresa = empresa.strip()
+    ticker = None
+    empresa_encontrada = None
 
-    if empresa == "":
-        return "Indica una empresa. Ejemplo: precio de la acción Microsoft."
+    for empresa, simbolo in EMPRESAS.items():
+        if empresa in consulta:
+            ticker = simbolo
+            empresa_encontrada = empresa
+            break
 
-    ticker = EMPRESAS.get(empresa, empresa.upper())
+    if ticker is None:
+        return "No encontré la empresa solicitada. Intenta con Apple, Microsoft, Tesla, Amazon, Google, Meta, Netflix o Nvidia."
 
     try:
         accion = yf.Ticker(ticker)
-        datos = accion.history(period="1d")
 
-        if datos.empty:
-            return f"No encontré datos para {empresa.title()}."
+        historial = accion.history(period="5d")
 
-        precio = datos["Close"].iloc[-1]
-        return f"El precio actual de la acción de {empresa.title()} es ${precio:.2f}."
+        if historial.empty:
+            return f"No pude obtener el precio actual de {empresa_encontrada}."
 
-    except Exception:
-        return "Ocurrió un error al consultar el precio de la acción."
+        precio = historial["Close"].iloc[-1]
+
+        try:
+            divisa = accion.fast_info.get("currency", "USD")
+        except Exception:
+            divisa = "USD"
+
+        return f"El precio actual de la acción de {empresa_encontrada.title()} ({ticker}) es {precio:.2f} {divisa}."
+
+    except Exception as error:
+        return f"Ocurrió un error al obtener el precio de la acción: {error}"
